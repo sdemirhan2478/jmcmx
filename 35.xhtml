@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://xmlns.jcp.org/jsf/html"
+xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+xmlns:f="http://xmlns.jcp.org/jsf/core"
+xmlns:p="http://primefaces.org/ui"  >
+    
+
+<h:body> 
+<ui:composition template="template/common/commonLayout.xhtml" >
+<ui:define name="title">Siparişler</ui:define>
+<ui:define name="content">
+
+    <script> 
+        #{userBean.temizToggles()}
+        #{userBean.addToggles(35)} 
+        #{userBean.addToggles(3501)} 
+        #{userBean.addToggles(3502)}   
+        #{userBean.addToggles(3503)}   
+        #{userBean.addToggles(3504)} 
+        #{userBean.addToggles(3505)} 
+        #{userBean.addToggles(3506)} 
+        #{userBean.addToggles(3507)} 
+        #{siparisToolBean.siparisEkranOpen()}
+    </script> 
+    
+    <h:form id="frmSiparis"  onkeypress="if (event.keyCode === 13) { return false; }"   > 
+        <p:remoteCommand name="sipyilara" 
+                         actionListener="#{siparisToolBean.secSipYilArama()}" oncomplete="PF('dtSiparis').clearFilters()"
+                         onstart="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()"  
+                         update=" :frmSiparis:pnlBlmDrm :frmSiparis:pnlSiparisArama :frmSiparis:pnlSiparisUst" >
+        </p:remoteCommand>   
+        <p:outputPanel id="opnlSiparis"  >
+            <p:panelGrid id="pnlSiparisFlrt" style="width: 100% !important;max-height: 20px !important;border-bottom: none !important;border-top: none !important;border-left:  none !important;border-right:  none !important;"  >
+                <p:row style="width: 100% !important;max-height: 20px !important;border: none !important;">
+                    <p:column style="border: none !important;">
+                        <p:outputPanel id="pnlBlmDrm"  style="display: inline-block !important; vertical-align:middle !important; " >
+                            <h:outputText value="Bölüm:" style="display: inline-block !important; vertical-align:middle !important; " />
+                            &#160;
+                            <p:selectOneMenu  value="#{siparisToolBean.selSipDepartman}"  filter="true" dynamic="true" converter="omnifaces.SelectItemsConverter"
+                                              style="width:100px;display: inline-block !important; vertical-align:middle !important;"  >
+                                <f:selectItems value="#{siparisToolBean.lstSipDepartman}" var="lstblm"  
+                                               itemLabel="#{lstblm.bolumAdi}" itemValue="#{lstblm}"   />
+                                <p:ajax  event="itemSelect" listener="#{siparisToolBean.secDepartman()}"  oncomplete="PF('dtSiparis').clearFilters()" 
+                                         update=" :frmSiparis:pnlSiparisUst :frmSiparis:pnlSiparisArama :frmSiparis:pnlBlmDrm"
+                                         onstart="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()"    /> 
+                            </p:selectOneMenu>
+                            &#160;&#160;
+                            <h:outputText value="Durum:" style="display: inline-block !important; vertical-align:middle !important; "  />
+                            &#160;
+                            <p:selectOneMenu  value="#{siparisToolBean.selSipDurum}"  filter="true" dynamic="true" converter="omnifaces.SelectItemsConverter" 
+                                                style="width:200px;display: inline-block !important; vertical-align:middle !important;" height="500"  >
+                                <f:selectItems value="#{siparisToolBean.lstSipDurum}" var="lstdrm"  
+                                               itemLabel="#{(lstdrm.durumAdi)}" itemValue="#{lstdrm}"   />
+                                <p:ajax  event="itemSelect" listener="#{siparisToolBean.secSipDurumArama()}" oncomplete="PF('dtSiparis').clearFilters()" 
+                                         update=" :frmSiparis:pnlSiparisUst :frmSiparis:pnlSiparisArama "
+                                         onstart="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()"   /> 
+                            </p:selectOneMenu> 
+                        </p:outputPanel>
+                        &#160;&#160;
+                        <p:outputPanel id="pnlSiparisSvkRzv"  style="display: inline-block !important; vertical-align:middle !important; "  >
+                            <h:outputText value="Ham Rezerv :" style="display: inline-block !important; vertical-align:middle !important; " />
+                            <p:inputSwitch  value="#{siparisToolBean.hamRrzvGstr}" style="display: inline-block !important; vertical-align:middle !important; " >
+                                <p:ajax listener="#{siparisToolBean.secSipDurumArama()}"  oncomplete="PF('dtSiparis').clearFilters()"  update=" :frmSiparis:pnlSiparisUst :frmSiparis:pnlSiparisArama " onstart="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()"  />
+                            </p:inputSwitch >
+                            &#160;
+                            <h:outputText value="Mamul Sevk :" style="display: inline-block !important; vertical-align:middle !important; " />
+                            <p:inputSwitch  value="#{siparisToolBean.mamRrzvGstr}" style="display: inline-block !important; vertical-align:middle !important; " >
+                                <p:ajax listener="#{siparisToolBean.secSipDurumArama()}"  oncomplete="PF('dtSiparis').clearFilters()"  update=" :frmSiparis:pnlSiparisUst :frmSiparis:pnlSiparisArama " onstart="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()"  />
+                            </p:inputSwitch >
+                        </p:outputPanel>
+                        &#160;&#160;
+                        <p:outputPanel id="pnlSiparisArama"  style="display: inline-block !important; vertical-align:middle !important; "  >
+                            <h:outputText value="ARAMA:" style="display: inline-block !important; vertical-align:middle !important; "  
+                                           rendered="#{siparisToolBean.selSipDurum.durumGrup.equalsIgnoreCase('2') or siparisToolBean.selSipDurum.durumGrup.equalsIgnoreCase('3')}"/>
+                             &#160;
+                            <p:outputPanel id="pnlTarihAralik"  style="display: inline-block !important; vertical-align:middle !important; " 
+                                           rendered="#{siparisToolBean.selSipDurum.durumGrup.equalsIgnoreCase('2')}"  >
+                                <h:outputText value="İlk:" style="display: inline-block !important; vertical-align:middle !important; " />
+                                &#160;
+                                <p:calendar value="#{siparisToolBean.selMyParametre.myMinDate}"  pattern="dd.MM.yyyy HH:mm" locale="tr" size="15" 
+                                            style="text-align: left;display: inline-block !important; vertical-align:middle !important;">
+                                </p:calendar>
+                                &#160;
+                                <h:outputText value="Son" style="display: inline-block !important; vertical-align:middle !important; " />
+                                &#160;
+                                <p:calendar value="#{siparisToolBean.selMyParametre.myMaxDate}"  pattern="dd.MM.yyyy HH:mm" locale="tr" size="15"  
+                                            style="text-align: left;display: inline-block !important; vertical-align:middle !important;">
+                                </p:calendar>
+                                &#160;                
+                                <p:commandButton value="Getir" action="#{siparisToolBean.secSipTarihAralikArama()}" rendered="#{siparisToolBean.selSipDurum.durumGrup.equalsIgnoreCase('2')}"
+                                                 onclick="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()" oncomplete="PF('dtSiparis').clearFilters()"
+                                                 icon="fas fa-edit"  update=" :frmSiparis:pnlBlmDrm :frmSiparis:pnlSiparisArama :frmSiparis:pnlSiparisUst" />
+
+                            </p:outputPanel>                        
+                             &#160;
+                            <p:outputPanel id="pnlAramaYil"  style="display: inline-block !important; vertical-align:middle !important; " 
+                                           rendered="#{siparisToolBean.selSipDurum.durumGrup.equalsIgnoreCase('3')}"   >
+                                <h:outputText value="Yıl:" style="display: inline-block !important; vertical-align:middle !important; " />
+                                &#160;
+                                <p:inputText id="spfyt" value="#{siparisToolBean.selMyParametre.myYear}" onkeypress="if (event.keyCode===13) {event.target.blur(); event.stopPropagation();sipyilara([]); return false;}"
+                                             style="text-align: center;width:80px;display: inline-block !important; vertical-align:middle !important;" >
+                                    <f:convertNumber pattern="0000" />
+                                </p:inputText>  
+                            </p:outputPanel>
+                            &#160;&#160;                                                                                                 
+                        </p:outputPanel>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+
+            <p:panelGrid id="pnlSiparisUst"  >
+                <p:row>
+                    <p:column>      
+                        <p:outputPanel id="pnlSiparis"  >
+                            <div id="tbl_div"> <script> $("#tbl_div").keydown(function(event) {if (event.which === 38) {event.preventDefault();up('dtSiparis');} if (event.which === 40) {event.preventDefault();down('dtSiparis');}}); </script> 
+                                <p:dataTable binding="#{siparisToolBean.dtSiparis}" id="dtSiparis" value="#{siparisBean.lstSiparis}" var="dtSiparis" widgetVar="dtSiparis" rowIndexVar="rowIndex"   
+                                             selectionMode="single" selection="#{siparisBean.selSiparis}" rowKey="#{dtSiparis.hashCode()}"    
+                                         rows="25" currentPageReportTemplate="Aktif Sipariş : {totalRecords} / Gösterilen: {startRecord} - {endRecord} " 
+                                         paginator="true" paginatorPosition="top" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="25,50,100"  resizableColumns="true" scrollable="true" scrollHeight="#{userBean.logUser.getCzn(500.0)}"  
+                                         style="text-align:left; min-height:#{userBean.logUser.getCzn(580.0)}px !important" size="small" stripedRows="true" showGridlines="true" >
+
+                                <f:facet name="header" >  
+                                    <p:commandButton value="Seç"   icon="fab fa-centos" actionListener="#{userBean.secToggles(35)}"  style="float: right;" />
+                                    <p:commandButton value="Excel"  icon="far fa-file-excel" ajax="false" style="float: right;" > 
+                                        <p:dataExporter type="xlsx" target=":frmSiparis:dtSiparis" fileName="dtSiparis"  />
+                                    </p:commandButton>
+                                    <p:commandButton  value="Yeni"  actionListener="#{siparisBean.siparisEkle()}" style="float:right;" icon="far fa-plus-square" /> 
+                                </f:facet>
+
+                                <p:ajax event="rowSelect" listener="#{siparisBean.onRowSelect}"   />
+                                <p:ajax event="rowDblselect"  listener="#{siparisBean.siparisDuzenle()}" />
+
+                                <p:column headerText="#{userBean.usrToggles.get('35siparisNo').getItemAdi()}" rendered="#{userBean.usrToggles.get('35siparisNo').getItemRender()}" 
+                                          sortBy="#{dtSiparis.siparisNo}" filterBy="#{dtSiparis.siparisNo}" filterMatchMode="startsWith" filterStyle="width:90%" style=" width:13%" 
+                                          displayPriority="#{userBean.usrToggles.get('35siparisNo').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.siparisNo}"  />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35dahiliSiparis').getItemAdi()}" rendered="#{userBean.usrToggles.get('35dahiliSiparis').getItemRender()}" 
+                                          sortBy="#{dtSiparis.dahiliSiparis}"  filterBy="#{dtSiparis.dahiliSiparis}" filterMatchMode="startsWith" filterStyle="width:90%" 
+                                          style=" width:5%;background-color: #{dtSiparis.dahiliSiparis? 'lime' :''};font-weight: bold!important;color:#{dtSiparis.dahiliSiparis? 'black' :''} "  
+                                          displayPriority="#{userBean.usrToggles.get('35dahiliSiparis').getSira()}" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtSiparis').filter()">
+                                            <f:selectItem  itemLabel="Tümü"  itemValue=""/>
+                                            <f:selectItem  itemLabel="Dahili"  itemValue="t"/>
+                                            <f:selectItem  itemLabel="Fason"  itemValue="f"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{dtSiparis.dahiliSiparis?'Dahili':'Fason'}" />
+                                </p:column>
+                                
+                                <p:column headerText="#{userBean.usrToggles.get('35temsilciAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35temsilciAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.temsilciAdi}"  filterBy="#{dtSiparis.temsilciAdi}" filterStyle="width:90%"  style=" width:5%"
+                                          displayPriority="#{userBean.usrToggles.get('35temsilciAdi').getSira()}">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu   onchange="PF('dtSiparis').filter()"
+                                                           style="width:120px;display: inline-block !important; vertical-align:middle !important;"  >
+                                            <f:selectItems value="#{siparisToolBean.lstSipTemsilci}" var="lsttem"  
+                                                           itemLabel="#{lsttem.adiSoyadi}" itemValue="#{lsttem.adiSoyadi}"   />
+
+                                        </p:selectOneMenu>   
+                                    </f:facet>
+                                    <h:outputText value="#{dtSiparis.temsilciAdi}" />
+                                </p:column>
+                                
+
+
+
+                                <p:column headerText="#{userBean.usrToggles.get('35siparisTurAdi').getItemAdi()}"  rendered="#{userBean.usrToggles.get('35siparisTurAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sipTur.siparisTurAdi}" filterBy="#{dtSiparis.sipTur.siparisTurAdi}"  filterMatchMode="equals" filterStyle="width:90%" 
+                                          style=" width:8%" displayPriority="#{userBean.usrToggles.get('35siparisTurAdi').getSira()}" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtSiparis').filter()">
+                                            <f:selectItem  itemLabel="Tümü"  itemValue=""/>
+                                            <f:selectItems value="#{siparisToolBean.lstSipTur}" var="sptur" 
+                                                           itemLabel="#{sptur.siparisTurAdi}"  itemValue="#{sptur.siparisTurAdi}"  />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+
+                                      <h:outputText value="#{dtSiparis.sipTur.siparisTurAdi}" />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35firmaAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35firmaAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sipFirma.firmaAdi}"  filterBy="#{dtSiparis.sipFirma.firmaAdi}" filterMatchMode="startsWith" filterStyle="width:90%" 
+                                          style=" width:20%" displayPriority="#{userBean.usrToggles.get('35firmaAdi').getSira()}">
+                                    <h:outputText value="#{dtSiparis.sipFirma.firmaAdi}" />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35firmaSiparisNo').getItemAdi()}" rendered="#{userBean.usrToggles.get('35firmaSiparisNo').getItemRender()}" 
+                                          sortBy="#{dtSiparis.firmaSiparisNo}"  filterBy="#{dtSiparis.firmaSiparisNo}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35firmaSiparisNo').getSira()}">
+                                    <h:outputText value="#{dtSiparis.firmaSiparisNo}" />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35firmaStokAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35firmaStokAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.firmaStokAdi}"  filterBy="#{dtSiparis.firmaStokAdi}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:20%" styleClass="ilkhrf" displayPriority="#{userBean.usrToggles.get('35firmaStokAdi').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.firmaStokAdi}" />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35enEbat').getItemAdi()}"  rendered="#{userBean.usrToggles.get('35enEbat').getItemRender()}" 
+                                          sortBy="#{dtSiparis.mamulEn}" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35enEbat').getSira()}">
+                                    <h:outputText value="#{dtSiparis.mamulEn==0?'':dtSiparis.mamulEn}   #{(dtSiparis.atkiEbat==0 or dtSiparis.cozguEbat==0)?'':'-'} 
+                                                  #{dtSiparis.cozguEbat==0?'':dtSiparis.cozguEbat}        #{dtSiparis.cozguEbat==0?'':'X'}
+                                                  #{dtSiparis.atkiEbat==0?'':dtSiparis.atkiEbat}"  />
+                                </p:column>    
+
+                                <p:column headerText="#{userBean.usrToggles.get('35kayitTarihi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35kayitTarihi').getItemRender()}" 
+                                          filterBy="#{dtSiparis.kayitTarihi}" filterMatchMode="equals" filterStyle="width:90%" 
+                                          sortBy="#{dtSiparis.kayitTarihi}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35kayitTarihi').getSira()}" >
+
+                                    <f:facet name="filter">
+                                        <p:calendar autocomplete="off" styleClass="calendarFilter" pattern="dd.MM.yyyy" locale="tr"  size="10" navigator="true" >
+                                              <p:ajax event="dateSelect" oncomplete="PF('dtSiparis').filter()"  />
+                                              <p:ajax event="change" oncomplete="PF('dtSiparis').filter()"  />
+                                        </p:calendar>
+                                    </f:facet>   
+
+                                    <h:outputText value="#{dtSiparis.kayitTarihi}" >
+                                        <f:convertDateTime pattern="dd.MM.yy" />
+                                    </h:outputText>    
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35prosesGrupAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35prosesGrupAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sipProsesGrup.prosesGrupAdi}"  filterBy="#{dtSiparis.sipProsesGrup.prosesGrupAdi}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35prosesGrupAdi').getSira()}">
+                                    <h:outputText value="#{dtSiparis.sipProsesGrup.prosesGrupAdi}"  /> 
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35renkTanim').getItemAdi()}" rendered="#{userBean.usrToggles.get('35renkTanim').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sipRenk.renkTanim}"  filterBy="#{dtSiparis.sipRenk.renkTanim}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" styleClass="ilkhrf" displayPriority="#{userBean.usrToggles.get('35renkTanim').getSira()}" >
+                                    <h:outputText value="#{(dtSiparis.sipRenk.renkId==null||dtSiparis.sipRenk.renkId==0)?'':dtSiparis.sipRenk.renkTanim}" />
+                                </p:column>
+                                
+                                <p:column headerText="#{userBean.usrToggles.get('35rgbKodu').getItemAdi()}" rendered="#{userBean.usrToggles.get('35rgbKodu').getItemRender()}"
+                                          style=" width:3%; background-color:#{(dtSiparis.sipRenk.rgbKodu==null or dtSiparis.sipRenk.rgbKodu.equalsIgnoreCase('') or dtSiparis.sipRenk.rgbKodu.equalsIgnoreCase('fafafa')) ?'':dtSiparis.sipRenk.rgbKodu}"
+                                          displayPriority="#{userBean.usrToggles.get('35rgbKodu').getSira()}" >
+                                </p:column>
+                             
+                                <p:column headerText="#{userBean.usrToggles.get('35desenTanim').getItemAdi()}" rendered="#{userBean.usrToggles.get('35desenTanim').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sipDesen.desenTanim}"  filterBy="#{dtSiparis.sipDesen.desenTanim}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" styleClass="ilkhrf" displayPriority="#{userBean.usrToggles.get('35desenTanim').getSira()}" >
+                                    <h:outputText value="#{(dtSiparis.sipDesen.desenId==null||dtSiparis.sipDesen.desenId==0)?'':dtSiparis.sipDesen.desenTanim}" />
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35siparisTermin').getItemAdi()}" rendered="#{userBean.usrToggles.get('35siparisTermin').getItemRender()}" 
+                                          filterBy="#{dtSiparis.siparisTermin}" filterMatchMode="equals" filterStyle="width:90%" 
+                                          sortBy="#{dtSiparis.siparisTermin}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35siparisTermin').getSira()}" >
+                                    <f:facet name="filter">
+                                        <p:calendar autocomplete="off" styleClass="calendarFilter" pattern="dd.MM.yyyy" locale="tr"  size="10" navigator="true" >
+                                              <p:ajax event="dateSelect" oncomplete="PF('dtSiparis').filter()"  />
+                                              <p:ajax event="change" oncomplete="PF('dtSiparis').filter()"  />
+                                        </p:calendar>
+                                    </f:facet>   
+                                    <h:outputText value="#{dtSiparis.siparisTermin}" >
+                                        <f:convertDateTime pattern="dd.MM.yy" />
+                                    </h:outputText>    
+                                </p:column>      
+
+                                <p:column headerText="#{userBean.usrToggles.get('35siparisMiktar').getItemAdi()}"  rendered="#{userBean.usrToggles.get('35siparisMiktar').getItemRender()}" 
+                                          sortBy="#{dtSiparis.siparisMiktar}" style=" width:10%;text-align:right"  displayPriority="#{userBean.usrToggles.get('35siparisMiktar').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.siparisMiktar}" >
+                                        <f:convertNumber pattern="#,###,##0.#" />
+                                    </h:outputText>
+                                </p:column>  
+
+                                <p:column headerText="#{userBean.usrToggles.get('35rezervMiktar').getItemAdi()}" rendered="#{userBean.usrToggles.get('35rezervMiktar').getItemRender()}" 
+                                          sortBy="#{dtSiparis.rezervMiktar}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35rezervMiktar').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.rezervMiktar==0?'':dtSiparis.rezervMiktar}" >
+                                        <f:convertNumber pattern="#,###,##0.#" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35toplamPartiMiktar').getItemAdi()}" rendered="#{userBean.usrToggles.get('35toplamPartiMiktar').getItemRender()}" 
+                                          sortBy="#{dtSiparis.toplamPartiMiktar}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35toplamPartiMiktar').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.toplamPartiMiktar==0?'':dtSiparis.toplamPartiMiktar}" >
+                                        <f:convertNumber pattern="#,###,##0.#" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35miktarBirim').getItemAdi()}" rendered="#{userBean.usrToggles.get('35miktarBirim').getItemRender()}" 
+                                          sortBy="#{dtSiparis.miktarBirim}" style=" width:4%" displayPriority="#{userBean.usrToggles.get('35miktarBirim').getSira()}">
+                                    <h:outputText value="#{dtSiparis.miktarBirim}"/>
+                                </p:column>  
+
+                                <p:column headerText="#{userBean.usrToggles.get('35uretimMiktar').getItemAdi()}" rendered="#{userBean.usrToggles.get('35uretimMiktar').getItemRender()}" 
+                                          sortBy="#{dtSiparis.uretimMiktar}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35uretimMiktar').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.uretimMiktar==0?'':dtSiparis.uretimMiktar}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35kaliteMiktar').getItemAdi()}" rendered="#{userBean.usrToggles.get('35kaliteMiktar').getItemRender()}" 
+                                          sortBy="#{dtSiparis.kaliteMiktar}" style=" width:10%;text-align:right"  displayPriority="#{userBean.usrToggles.get('35kaliteMiktar').getSira()}">
+                                    <h:outputText value="#{dtSiparis.kaliteMiktar==0?'':dtSiparis.kaliteMiktar}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35sevkBrut').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkBrut').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkBrut}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkBrut').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkBrut==0?'':dtSiparis.sevkBrut}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35sevkNet').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkNet').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkNet}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkNet').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkNet==0?'':dtSiparis.sevkNet}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35sevkBir').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkBir').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkBir}" style=" width:7%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkBir').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkBir==0?'':dtSiparis.sevkBir}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35sevkBirA').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkBirA').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkBirA}" style=" width:7%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkBirA').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkBirA==0?'':dtSiparis.sevkBirA}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35sevkHurda').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkHurda').getItemRender()}" 
+                                          sortBy="#{dtSiparis.rezervMiktar}" style=" width:7%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkHurda').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkHurda==0?'':dtSiparis.sevkHurda}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column  headerText="#{userBean.usrToggles.get('35sevkFire').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkFire').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkFire}" style=" width:7%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkFire').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkFire==0?'':dtSiparis.sevkFire}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column  headerText="#{userBean.usrToggles.get('35sevkTemizFire').getItemAdi()}" rendered="#{userBean.usrToggles.get('35sevkTemizFire').getItemRender()}" 
+                                          sortBy="#{dtSiparis.sevkTemizFire}" style=" width:7%;text-align:right" displayPriority="#{userBean.usrToggles.get('35sevkTemizFire').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.sevkTemizFire==0?'':dtSiparis.sevkTemizFire}" >
+                                        <f:convertNumber pattern="#,###,##0" />
+                                    </h:outputText>
+                                </p:column> 
+
+                                <p:column headerText="#{userBean.usrToggles.get('35siparisFiyat').getItemAdi()}" rendered="#{userBean.usrToggles.get('35siparisFiyat').getItemRender()}" 
+                                          sortBy="#{dtSiparis.siparisFiyat}" style=" width:10%;text-align:right" displayPriority="#{userBean.usrToggles.get('35siparisFiyat').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.siparisFiyat}" >
+                                        <f:convertNumber pattern="#,###,##0.00" />
+                                    </h:outputText>
+                                </p:column>  
+
+                                <p:column  headerText="#{userBean.usrToggles.get('35paraBirim').getItemAdi()}" rendered="#{userBean.usrToggles.get('35paraBirim').getItemRender()}" 
+                                          sortBy="#{dtSiparis.paraBirim}" style=" width:6%" displayPriority="#{userBean.usrToggles.get('35paraBirim').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.paraBirim}"/>
+                                </p:column>    
+
+                                <p:column headerText="#{userBean.usrToggles.get('35tamirSebebiAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35tamirSebebiAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.tamirSebebiAdi}"  filterBy="#{dtSiparis.tamirSebebiAdi}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35tamirSebebiAdi').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.tamirSebebiAdi}"/>
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35standartAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35standartAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.standartAdi}"  filterBy="#{dtSiparis.standartAdi}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35standartAdi').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.standartAdi}"/>
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35durumAdi').getItemAdi()}" rendered="#{userBean.usrToggles.get('35durumAdi').getItemRender()}" 
+                                          sortBy="#{dtSiparis.durumAdi}"  filterBy="#{dtSiparis.durumAdi}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" displayPriority="#{userBean.usrToggles.get('35durumAdi').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.durumAdi}"/>
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35rapor').getItemAdi()}" rendered="#{userBean.usrToggles.get('35rapor').getItemRender()}"  sortable="false"
+                                          style=" width:5%;text-align: center" displayPriority="#{userBean.usrToggles.get('35rapor').getSira()}" >                               
+                                    <h:commandLink action="#{reportsRegBean.siparişRaporlari(dtSiparis.siparisId,'A')}" target="_blank" title="Sipariş Kartı" >
+                                        <p:graphicImage name="pdfb.png" width="20" height="20" library="imgs" />            
+                                    </h:commandLink> 
+                                </p:column>
+
+                                <p:column headerText="#{userBean.usrToggles.get('35aciklama').getItemAdi()}" rendered="#{userBean.usrToggles.get('35aciklama').getItemRender()}" 
+                                          sortBy="#{dtSiparis.aciklama}"  filterBy="#{dtSiparis.aciklama}" filterMatchMode="contains" filterStyle="width:90%" 
+                                          style=" width:10%" styleClass="ilkhrf" displayPriority="#{userBean.usrToggles.get('35aciklama').getSira()}" >
+                                    <h:outputText value="#{dtSiparis.aciklama}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                            </div>
+                         </p:outputPanel>      
+                    </p:column>
+                </p:row> 
+
+                <p:contextMenu id="cm" for="dtSiparis" > 
+                    <p:autoUpdate />
+                    <p:menuitem value="Yeni Sipariş"  actionListener="#{siparisBean.siparisEkle()}"  icon="far fa-plus-square" />
+                    <p:menuitem value="Sipariş Düzenle"  actionListener="#{siparisBean.siparisDuzenle()}"   icon="fas fa-edit"/>
+                    <p:menuitem value="Sipariş Kopyala"  actionListener="#{siparisBean.siparisKopyala()}"  icon="fas fa-copy"/>
+                </p:contextMenu> 
+
+            </p:panelGrid> 
+
+        </p:outputPanel>    
+
+
+
+        <p:dialog id="dlgGenelArama" widgetVar="dlgGenelArama"  closable="true"   header="35- Genel Arama"  position="center top" style="width: 100% " >
+            <p:panelGrid id="pnlGenelArama"  style="width: 100% !important;display: inline-block !important; vertical-align:middle !important; " >
+                <p:row> 
+                    <p:column style="width: 15%">
+                        <h:outputText value="Müşteri:" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column style="width: 35%">
+                        <p:selectOneMenu value="#{siparisToolBean.selMyParametre.myFirmaId}"  filter="true" dynamic="true" 
+                                             style="width: 90%;display: inline-block !important; vertical-align:middle !important;"  >
+                             <f:selectItems value="#{siparisToolBean.lstSipFirma}" var="lstfrm"  
+                                            itemLabel="#{lstfrm.firmaAdi}" itemValue="#{lstfrm.firmaId}"   />
+
+                         </p:selectOneMenu> 
+                    </p:column>
+                    <p:column style="width: 15%">
+                        <h:outputText value="Sipariş No:" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column style="width: 35%">
+                        <p:inputText value="#{siparisToolBean.selMyParametre.mySiparisNo}" 
+                                     style="text-align:left;width:90%;display: inline-block !important; vertical-align:middle !important;"/> 
+                    </p:column>
+                </p:row>  
+                <p:row> 
+                    <p:column>
+                        <h:outputText value="Renk" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu value="#{siparisToolBean.selMyParametre.myRenkId}"  filter="true" dynamic="true"  filterMatchMode="contains" 
+                                         style="width: 90%;display: inline-block !important; vertical-align:middle !important;">
+                            <f:selectItems value="#{siparisToolBean.lstRenk}" var="lstrnk"  
+                                           itemLabel="#{lstrnk.renkKod}" itemValue="#{lstrnk.renkId}"   />
+                        </p:selectOneMenu> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="Desen" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu  value="#{siparisToolBean.selMyParametre.myDesenId}"  filter="true" dynamic="true" filterMatchMode="contains" 
+                                         style="width: 90%;display: inline-block !important; vertical-align:middle !important;">
+                            <f:selectItems value="#{siparisToolBean.lstDesen}" var="lstdsn"  
+                                           itemLabel="#{lstdsn.desenKod}" itemValue="#{lstdsn.desenId}"   />
+                        </p:selectOneMenu> 
+                    </p:column>
+                </p:row>    
+                <p:row> 
+                    <p:column>
+                        <h:outputText value="Firma Sipariş" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column>
+                        <p:inputText value="#{siparisToolBean.selMyParametre.myFirmaSiparisNo}" 
+                                     style="text-align:left;width:90%;display: inline-block !important; vertical-align:middle !important;"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="Stok Adı:" style="display: inline-block !important; vertical-align:middle !important; " />
+                    </p:column>
+                    <p:column>
+                        <p:inputText value="#{siparisToolBean.selMyParametre.myStokAdi}" 
+                                     style="text-align:left;width:90%;display: inline-block !important; vertical-align:middle !important;"/> 
+                    </p:column>
+                </p:row> 
+               <p:row> 
+                   <p:column colspan="4" style="text-align: center">
+                        <p:commandButton value="Getir" action="#{siparisToolBean.secSipGenelArama()}" onclick="PF('dlgBlock').show()" onsuccess="PF('dlgBlock').hide()" 
+                                         icon="fas fa-edit"  update=" :frmSiparis:pnlBlmDrm :frmSiparis:pnlSiparisArama :frmSiparis:pnlSiparisUst" />      
+                    </p:column>
+                </p:row> 
+            </p:panelGrid>
+        </p:dialog>
+        
+    </h:form> 
+
+    
+    <ui:include src="3501.xhtml" />
+    <ui:include src="3502.xhtml" />
+    <ui:include src="3503.xhtml" />
+    <ui:include src="3504.xhtml" />
+    <ui:include src="3505.xhtml" />
+    <ui:include src="3506.xhtml" />
+    <ui:include src="3507.xhtml" />
+    <ui:include src="block.xhtml"/>
+    <ui:include src="toggles.xhtml"/>
+    
+
+    
+</ui:define>
+</ui:composition>
+</h:body>
+</html>
