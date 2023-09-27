@@ -16,12 +16,13 @@
     <packaging>jar</packaging>
 
 
-    <name>HelloTribuo</name>
+    <name>jmcmx</name>
 
     <properties>
         <main.class>com.gluonhq.samples.sample.Main</main.class>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <app.identifier>${main.class}</app.identifier>
     </properties>
 
     <dependencies>
@@ -114,6 +115,12 @@
             <id>android</id>
             <properties>
                 <gluonfx.target>android</gluonfx.target>
+                <app.identifier>com.gluonhq.samples.hellogluon</app.identifier>
+                <version.code>${env.GITHUB_RUN_NUMBER}</version.code>
+                <provided.keystore.path>${env.GLUON_ANDROID_KEYSTOREPATH}</provided.keystore.path>
+                <provided.keystore.password>${env.GLUON_ANDROID_KEYSTORE_PASSWORD}</provided.keystore.password>
+                <provided.key.alias>${env.GLUON_ANDROID_KEYALIAS}</provided.key.alias>
+                <provided.key.alias.password>${env.GLUON_ANDROID_KEYALIAS_PASSWORD}</provided.key.alias.password>
             </properties>
         </profile>
         <profile>
